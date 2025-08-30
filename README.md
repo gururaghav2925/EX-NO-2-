@@ -4,10 +4,7 @@
 
 ## AIM:
  
-
- 
-
-To write a C program to implement the Playfair Substitution technique.
+To write a Python program to implement the Playfair Substitution technique.
 
 ## DESCRIPTION:
 
@@ -34,10 +31,102 @@ STEP-5: Display the obtained cipher text.
 
 
 
-Program:
+## Program:
+
+```py
+def generate_matrix(key):
+    key = key.upper().replace("J", "I")
+    matrix = []
+    used = set()
+    for ch in key:
+        if ch not in used and ch.isalpha():
+            used.add(ch)
+            matrix.append(ch)
+    for ch in "ABCDEFGHIKLMNOPQRSTUVWXYZ":
+        if ch not in used:
+            used.add(ch)
+    return [matrix[i:i+5] for i in range(0, 25, 5)]
+def find_position(matrix, ch):
+    for row in range(5):
+        for col in range(5):
+            if matrix[row][col] == ch:
+                return row, col
+    return None
+def preprocess_text(text):
+    text = text.upper().replace("J", "I")
+    prepared = ""
+    i = 0
+    while i < len(text):
+        ch1 = text[i]
+        if not ch1.isalpha():
+            i += 1
+            continue
+        if i+1 < len(text):
+            ch2 = text[i+1]
+            if ch1 == ch2:
+                prepared += ch1 + "X"
+                i += 1
+            else:
+                prepared += ch1 + ch2
+                i += 2
+        else:
+            prepared += ch1 + "X"
+            i += 1
+    return prepared
+def encrypt(text, matrix):
+    cipher = ""
+    for i in range(0, len(text), 2):
+        ch1, ch2 = text[i], text[i+1]
+        r1, c1 = find_position(matrix, ch1)
+        r2, c2 = find_position(matrix, ch2)
+        if r1 == r2:  
+            cipher += matrix[r1][(c1+1) % 5] + matrix[r2][(c2+1) % 5]
+        elif c1 == c2:  
+            cipher += matrix[(r1+1) % 5][c1] + matrix[(r2+1) % 5][c2]
+        else:  
+            cipher += matrix[r1][c2] + matrix[r2][c1]
+    return cipher
+def decrypt(cipher, matrix):
+    plain = ""
+    for i in range(0, len(cipher), 2):
+        ch1, ch2 = cipher[i], cipher[i+1]
+        r1, c1 = find_position(matrix, ch1)
+        r2, c2 = find_position(matrix, ch2)
+
+        if r1 == r2: 
+            plain += matrix[r1][(c1-1) % 5] + matrix[r2][(c2-1) % 5]
+        elif c1 == c2:  
+            plain += matrix[(r1-1) % 5][c1] + matrix[(r2-1) % 5][c2]
+        else:  
+            plain += matrix[r1][c2] + matrix[r2][c1]
+    return plain
+key = input("Enter the key: ")
+matrix = generate_matrix(key)
+print("\nPlayfair Matrix:")
+for row in matrix:
+    print(" ".join(row))
+plain = input("\nEnter the plain text: ")
+prepared_text = preprocess_text(plain)
+cipher = encrypt(prepared_text, matrix)
+decrypted = decrypt(cipher, matrix)
+print("\nPrepared Text:", prepared_text)
+print("Encrypted Text:", cipher)
+print("Decrypted Text:", decrypted)
+
+
+
+```
 
 
 
 
 
-Output:
+## Output:
+
+<img width="1919" height="1019" alt="Screenshot 2025-08-30 094346" src="https://github.com/user-attachments/assets/a45e2e86-bb9d-41c9-a7ff-8806b6a987d9" />
+
+<img width="1919" height="1020" alt="image" src="https://github.com/user-attachments/assets/5b90ae2a-a975-432e-8697-65978ba655ae" />
+
+
+## Result:
+Thus the Python program to implement the Playfair Substitution technique was  completed and successfully executed.
